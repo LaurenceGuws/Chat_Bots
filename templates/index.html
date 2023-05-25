@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Room</title>
+    <style>
+      /* Chat bubble */
+      .bubble {
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+      }
+
+      /* Sender's chat bubble */
+      .bubble-sender {
+        background-color: #dcf8c6;
+        float: right;
+      }
+
+      /* Receiver's chat bubble */
+      .bubble-receiver {
+        background-color: #fff;
+        float: left;
+      }
+
+      /* Stack chat bubbles */
+      .bubble-stack {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Messages</h1>
+    <div class="bubble-stack">
+      {% for message in messages %}
+        {% if loop.index % 2 == 0 %}
+          <div class="bubble bubble-receiver">{{ message }}</div>
+        {% else %}
+          <div class="bubble bubble-sender">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <form action="/" method="post">
+      <input type="text" name="message" id="message" placeholder="Type your message here...">
+      <button type="submit">Send</button>
+    </form>
+  </body>
+</html>
