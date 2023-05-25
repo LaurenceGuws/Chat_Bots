@@ -1,11 +1,12 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from Chat import Chat
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 chat = Chat(project_id='palm-386622',
  model_name='chat-bison@001',
@@ -34,36 +35,37 @@ else:
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    messages = []
     if request.method == 'POST':
         message = request.form['message']
-        messages = request.args.getlist('messages')
-        print('message:'+message)
-        conversation_id = request.args.get('conversation_id')
-        print(f'conversation_id: {conversation_id}')
-        if conversation_id:
-            conversation = Conversation.query.get(conversation_id)
-        else:
+        messages = session['messages']
+        print(messages)
+        # need to figure out how to add conversation_id here
+        if session.get('conversation_id') is None:
             conversation = Conversation(name=message)
             db.session.add(conversation)
             db.session.commit()
             conversation_id = db.session.query(db.func.max(Conversation.id)).scalar()
-            print(f'conversation_id: {conversation_id}')
-        
+            session['conversation_id'] = conversation_id
+            print(f'new conversation_id: {conversation_id}')
+        conversation_id = session['conversation_id']
+        print(f'conversation_id: {conversation_id}')
+
         if message is not None:
             messages.append('You: ' + message)
-            message_obj = Message(user='You', text=message, conversation_id=conversation.id)
+            message_obj = Message(user='You', text=message, conversation_id=conversation_id)
             db.session.add(message_obj)
         response = chat.send_message(message)
         if message is not None:
             messages.append('Bard: ' + response)
-            print('bard: '+response)
-            message_obj = Message(user='Bard', text=response, conversation_id=conversation.id)
+            message_obj = Message(user='Bard', text=response, conversation_id=conversation_id)
             db.session.add(message_obj)
             db.session.commit()
-        return render_template('index.html', messages=messages, conversation_id=conversation_id)
+            session['messages'] = messages
+        return render_template('index.html')
     else:   
-        return render_template('index.html', messages=messages)
+        if session.get('messages') is None:
+            session['messages'] = []
+        return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -32,7 +32,7 @@
   <body>
     <h1>Messages</h1>
     <div class="bubble-stack">
-      {% for message in messages %}
+      {% for message in session['messages'] %}
         {% if loop.index % 2 == 0 %}
           <div class="bubble bubble-receiver">{{ message }}</div>
         {% else %}
