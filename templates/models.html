@@ -3,8 +3,8 @@
   <head>
     <title>Chat Room</title>
     <style>
-/* Chat bubble */
-.bubble {
+      /* Chat bubble */
+      .bubble {
         border-radius: 5px;
         padding: 10px;
         margin: 10px 0;
@@ -41,17 +41,16 @@
   </head>
   <body>
     <header class="header">
-      <h1>Messages</h1>
-      <form action="/goto_conversation" method="post">
-        <select name="conversation_name">
-          {% for name in conversation_names %}
-            <option value="{{ name }}">{{ name }}</option>
-          {% endfor %}
-        </select>
-        <button type="submit">Go To Conversation</button>
-      </form>
+        <h1>Messages</h1>
+        <form action="/goto_model" method="post">
+            <select name="model_name">
+            {% for name in model_names %}
+                <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+            </select>
+            <button type="submit">Go To Model</button>
+        </form>
     </header>
-    
 
     <div class="bubble-stack">
       {% for message in session['messages'] %}

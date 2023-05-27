@@ -2,24 +2,36 @@
 <html>
   <head>
     <title>Chat Room</title>
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
     <style>
       /* Chat bubble */
       .bubble {
         border-radius: 5px;
         padding: 10px;
         margin: 10px 0;
+        max-width: 70%; /* Prevent bubbles from occupying full width */
       }
 
       /* Sender's chat bubble */
       .bubble-sender {
         background-color: #dcf8c6;
-        float: right;
+        align-self: flex-end; /* Align to the right */
       }
 
       /* Receiver's chat bubble */
       .bubble-receiver {
         background-color: #f9adad;
-        float: left;
+        align-self: flex-start; /* Align to the left */
+      }
+
+      /* Header bar */
+      .header {
+        background-color: #f2f2f2;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
 
       /* Stack chat bubbles */
@@ -27,24 +39,32 @@
         display: flex;
         flex-direction: column;
       }
-
-      /* Add background color */
-      .bubble-background {
-        background-color: #f2f2f2;
-      }
-
     </style>
   </head>
   <body>
-    <h1>Messages</h1>
+    <header class="header">
+      <h1>Messages</h1>
+      <form action="/models" method="get">
+        <select name="model_name">
+          {% for name in model_names %}
+            <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Pick Model</button>
+      </form>
 
-    <form action="/conversations" method="get">
-      <select name="conversation_name">
-        {% for name in conversation_names %}
-          <option value="{{ name }}">{{ name }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit">Go To Conversation</button>
+      <form action="/conversations" method="get">
+        <select name="conversation_name">
+          {% for name in conversation_names %}
+            <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Go To Conversation</button>
+      </form>
+    </header>
+    <form action="/postfile" method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <button type="submit">Upload</button>
     </form>
 
     <div class="bubble-stack">
@@ -56,11 +76,34 @@
         {% endif %}
       {% endfor %}
     </div>
-
     <form action="/" method="post">
       <input type="text" name="message" id="message" placeholder="Type your message here...">
       <button type="submit">Send</button>
     </form>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <script>4
+      document.addEventListener("DOMContentLoaded", (event) => {
+        // Parse messages
+        document.querySelectorAll('.bubble').forEach((bubble) => {
+          const message = bubble.innerHTML;
+          const codeBlockRegex = /```(.*?)```/gs;
+
+          bubble.innerHTML = message.replace(codeBlockRegex, (match, group) => {
+            // Remove backticks and split the language from the code
+            const [language, ...codeLines] = group.slice(3, -3).split('\n');
+            const code = codeLines.join('\n');
+
+            // Create a code block with the language and code
+            return `<pre><code class="language-${language}">${code}</code></pre>`;
+          });
+        });
+
+        // Highlight code
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+      });
+    </script>
   </body>
 </html>

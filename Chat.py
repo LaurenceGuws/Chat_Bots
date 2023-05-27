@@ -1,4 +1,6 @@
 from predict import predict_large_language_model_sample
+from predict_gpt_35_turbo import predict_gpt_35_turbo
+
 
 class Chat:
     def __init__(self, project_id, model_name, temperature, max_output_tokens, top_p, top_k):
@@ -19,6 +21,9 @@ class Chat:
             top_p=self.top_p,
             top_k=self.top_k,
         )
+        return response
+    def predict_gpt_35_turbo_call(messages):
+        response = predict_gpt_35_turbo(messages)
         return response
 
 if __name__ == '__main__':
