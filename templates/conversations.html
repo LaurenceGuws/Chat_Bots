@@ -38,13 +38,13 @@
   <body>
     <h1>Messages</h1>
 
-    <form action="/conversations" method="get">
-      <select name="conversation_name">
-        {% for name in conversation_names %}
-          <option value="{{ name }}">{{ name }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit">Go To Conversation</button>
+    <form action="/goto_conversation" method="post">
+        <select name="conversation_name">
+          {% for name in conversation_names %}
+            <option value="{{ name }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Go To Conversation</button>
     </form>
 
     <div class="bubble-stack">

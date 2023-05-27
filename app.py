@@ -1,7 +1,21 @@
 import os
-from flask import Flask, render_template, request, session
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from Chat import Chat
+import sqlite3
+
+def get_conversation_names():
+    conversation_names = [row[0] for row in db.session.query(Conversation.name).all()]
+    return conversation_names
+
+def get_conversation_id(conversation_name):
+    conversation_id = db.session.query(Conversation.id).filter(Conversation.name == conversation_name).scalar()
+    return conversation_id
+
+def load_messages(conversation_id):
+    messages = [row[0] for row in db.session.query(Message.text).filter(Message.conversation_id == conversation_id).all()]
+    session['messages'] = messages
+    return messages
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
@@ -66,6 +80,27 @@ def index():
         if session.get('messages') is None:
             session['messages'] = []
         return render_template('index.html')
+    
+@app.route('/conversations')
+def conversations():
+    conversation_names = get_conversation_names()
+    # render a template with the conversation names
+    return render_template('conversations.html', conversation_names=conversation_names)
+
+@app.route('/goto_conversation', methods=['POST'])
+def goto_new_conversation():
+    conversation_name = request.form['conversation_name']
+    session['conversation_id'] = get_conversation_id(conversation_name)
+    session['messages'] = load_messages(session['conversation_id'])
+    return render_template('index.html')
+
+
+@app.route('/conversations', methods=['GET'])
+def goto_conversation():
+    conversation_name = request.args.get('conversation_name')
+    return redirect(url_for('conversation', conversation_name=conversation_name))
+
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
