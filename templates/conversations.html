@@ -1,72 +1,172 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Chat Room</title>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <title>Conversations</title>
     <style>
-/* Chat bubble */
-.bubble {
-        border-radius: 5px;
-        padding: 10px;
-        margin: 10px 0;
-        max-width: 70%; /* Prevent bubbles from occupying full width */
+      body {
+          font-family: 'Roboto', sans-serif;
+          margin: 0;
+          padding: 0;
+          background: #000000; /* Deep Black Background */
+          color: #fa1e0e; /* Bright Red Color */
       }
 
-      /* Sender's chat bubble */
-      .bubble-sender {
-        background-color: #dcf8c6;
-        align-self: flex-end; /* Align to the right */
+      #chat-app {
+          display: grid;
+          place-items: center;
+          height: 100vh;
+          padding: 20px;
       }
 
-      /* Receiver's chat bubble */
-      .bubble-receiver {
-        background-color: #f9adad;
-        align-self: flex-start; /* Align to the left */
+      #chat-container {
+          position: relative;
+          width: 80%;
+          height: 600px;
+          border-radius: 20px;
+          background: #000000; /* Deep Black Container */
+          box-shadow: 0 5px 15px rgba(255, 0, 0, 0.5); /* Reddish shadow */
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
       }
 
-      /* Header bar */
-      .header {
-        background-color: #f2f2f2;
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+      #messages {
+          padding: 20px;
+          overflow: auto;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
       }
 
-      /* Stack chat bubbles */
-      .bubble-stack {
-        display: flex;
-        flex-direction: column;
+      #messages::-webkit-scrollbar {
+          width: 5px;
       }
-    </style>
-  </head>
-  <body>
-    <header class="header">
-      <h1>Messages</h1>
-      <form action="/goto_conversation" method="post">
-        <select name="conversation_name">
-          {% for name in conversation_names %}
-            <option value="{{ name }}">{{ name }}</option>
-          {% endfor %}
-        </select>
-        <button type="submit">Go To Conversation</button>
-      </form>
-    </header>
-    
 
-    <div class="bubble-stack">
-      {% for message in session['messages'] %}
-        {% if loop.index % 2 == 0 %}
-          <div class="bubble bubble-receiver">{{ message }}</div>
-        {% else %}
-          <div class="bubble bubble-sender">{{ message }}</div>
-        {% endif %}
-      {% endfor %}
+      #messages::-webkit-scrollbar-thumb {
+          background-color: #fa1e0e; /* Bright Red Scrollbar */
+          border-radius: 10px;
+      }
+
+      .message {
+          margin-bottom: 10px;
+          width: fit-content;
+          max-width: 80%;
+          padding: 10px 20px;
+          border-radius: 20px;
+          line-height: 1.4;
+          position: relative;
+          color: #c9d1d9; /* Greyish Text */
+          box-shadow: 2px 2px 10px 0 rgba(255, 0, 0, 0.5); /* Reddish Shadow */
+      }
+
+      .message.Bard {
+          align-self: flex-start;
+          background: #fa1e0e; /* Bright Red Message Bubble for Bard */
+      }
+
+      .message.User {
+          align-self: flex-end;
+          background: #000000; /* Black Message Bubble for User */
+      }
+
+      #input-area {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 20px;
+          background: #000000; /* Deep Black Input Area */
+          border-top: 1px solid #30363d;
+      }
+
+      #input-area textarea {
+          width: 100%;
+          min-height: 50px;
+          max-height: 150px;
+          border: none;
+          padding: 10px;
+          font-size: 16px;
+          resize: none;
+          overflow: auto;
+          outline: none;
+          border-radius: 20px;
+          background: #200505;
+          color: #c9d1d9;
+          margin-bottom: 10px;
+      }
+
+      #input-area button {
+          width: 100px;
+          align-self: flex-end;
+          height: 30px;
+          border: none;
+          outline: none;
+          font-size: 16px;
+          border-radius: 20px;
+          background: #fa1e0e; /* Bright Red Button */
+          color: #c9d1d9;
+          cursor: pointer;
+          transition: background 0.3s ease;
+      }
+
+      #input-area button:hover {
+          background: #fa1e0e;
+      }
+
+      #nav-buttons {
+          position: absolute;
+          top: 0;
+          right: 0;
+          /* other styles... */
+      }
+
+
+      #nav-buttons a {
+          padding: 10px 20px;
+          text-decoration: none;
+          color: #c9d1d9;
+          background: #fa1e0e; /* Bright Red Links */
+          border-radius: 20px;
+          transition: background 0.3s ease;
+      }
+
+      #nav-buttons a:hover {
+          background: #fa1e0e;
+      }
+      .form-control {
+            background-color: #200505;
+            border: none;
+            color: #c9d1d9;
+        }
+
+        /* Styling for the Button */
+        .btn {
+            background-color: #fa1e0e;
+            border: none;
+            color: #c9d1d9;
+        }
+
+        .btn:hover {
+            background-color: #fa1e0e;
+        }
+  </style>
+</head>
+<body>
+  <div id="chat-app">
+    <div id="chat-container">
+        <h1>Select a Conversation</h1>
+        <form action="{{ url_for('goto_new_conversation') }}" method="POST">
+            <select class="form-control" name="conversation_name">
+                {% for conversation_name in conversation_names %}
+                <option value="{{ conversation_name }}">{{ conversation_name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-danger">Select</button>
+        </form>
     </div>
-
-    <form action="/" method="post">
-      <input type="text" name="message" id="message" placeholder="Type your message here...">
-      <button type="submit">Send</button>
-    </form>
-
-  </body>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

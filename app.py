@@ -141,8 +141,24 @@ def goto_new_model():
     session['model_name'] = model_name
     return render_template('index.html')
 
+@app.route('/api/messages', methods=['GET'])
+def get_messages():
+    # Replace with your actual logic to fetch messages.
+    messages = session['messages']
+    messages = [msg.to_dict() for msg in messages]  # Convert messages to dictionaries (or any serializable format).
+    return {"messages": messages}, 200
 
+@app.route('/api/messages', methods=['POST'])
+def send_message():
+    data = request.get_json()
+    if not data or 'text' not in data:
+        return {"error": "No message provided"}, 400
+    message_text = data['text']
+    response = chat.send_message(message_text)
+    
+    # You might want to save the sent message and the response to your database here.
 
+    return {"response": response}, 200
     
 
 if __name__ == '__main__':
