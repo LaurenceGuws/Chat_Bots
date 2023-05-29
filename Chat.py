@@ -11,7 +11,7 @@ class Chat:
         self.top_p = top_p
         self.top_k = top_k
 
-    def send_message(self, message):
+    def send_bard_message(self, message):
         response = predict_large_language_model_sample(
             input=message,
             project_id=self.project_id,
@@ -24,10 +24,13 @@ class Chat:
         return response
 
     def chat_gpt_interact(self, messages):
+        import configparser
+        config = configparser.ConfigParser()
+        config.read('config.conf')
+        openai_api_key = config['OpenAI']['API_KEY']
         messages_dicts = []
-        api_key = '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'
-        openai.api_key = api_key
-        print(openai.Model.list())
+        openai.api_key = openai_api_key
+        # print(openai.Model.list())
         for i, message in enumerate(messages):
             if i % 2 == 0:
                 messages_dicts.append({"role": "system", "content": message})
@@ -36,7 +39,7 @@ class Chat:
 
         response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
+        temperature=0,
         messages=messages_dicts
         )
-
         return response['choices'][0]['message']['content']

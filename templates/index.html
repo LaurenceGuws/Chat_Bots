@@ -8,8 +8,8 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: #000000; /* Deep Black Background */
-            color: #fa1e0e; /* Bright Red Color */
+            background: #212121; /* Deep Black Background */
+            color: #6f0901; /* Bright Red Color */
         }
 
         #chat-app {
@@ -20,12 +20,12 @@
         }
 
         #chat-container {
-            position: relative;
-            width: 80%;
-            height: 600px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
             border-radius: 20px;
-            background: #000000; /* Deep Black Container */
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.5); /* Reddish shadow */
+            background: #333333; /* Deep Black Container */
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.0); /* Reddish shadow */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -45,7 +45,7 @@
         }
 
         #messages::-webkit-scrollbar-thumb {
-            background-color: #fa1e0e; /* Bright Red Scrollbar */
+            background-color: #430905; /* Bright Red Scrollbar */
             border-radius: 10px;
         }
 
@@ -57,18 +57,19 @@
             border-radius: 20px;
             line-height: 1.4;
             position: relative;
-            color: #c9d1d9; /* Greyish Text */
-            box-shadow: 2px 2px 10px 0 rgba(255, 0, 0, 0.5); /* Reddish Shadow */
+            color: #b3b3b3; /* Greyish Text */
         }
 
         .message.Bard {
             align-self: flex-start;
-            background: #fa1e0e; /* Bright Red Message Bubble for Bard */
+            font: #333333;
+            background: #6f0901; /* Bright Red Message Bubble for Bard */
         }
 
         .message.User {
             align-self: flex-end;
-            background: #000000; /* Black Message Bubble for User */
+            font: #6f0901;
+            background: #1a1a1a; /* Black Message Bubble for User */
         }
 
         #input-area {
@@ -76,13 +77,13 @@
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
-            background: #000000; /* Deep Black Input Area */
+            background: #333333; /* Deep Black Input Area */
             border-top: 1px solid #30363d;
         }
 
         #input-area textarea {
             width: 100%;
-            min-height: 50px;
+            min-height: 30px;
             max-height: 150px;
             border: none;
             padding: 10px;
@@ -92,7 +93,7 @@
             outline: none;
             border-radius: 20px;
             background: #200505;
-            color: #c9d1d9;
+            color: #b3b3b3;
             margin-bottom: 10px;
         }
 
@@ -104,20 +105,20 @@
             outline: none;
             font-size: 16px;
             border-radius: 20px;
-            background: #fa1e0e; /* Bright Red Button */
-            color: #c9d1d9;
+            background: #200505; /* Bright Red Button */
+            color: #b3b3b3;
             cursor: pointer;
             transition: background 0.3s ease;
         }
 
         #input-area button:hover {
-            background: #fa1e0e;
+            background: #6f0901;
         }
 
         #nav-buttons {
             position: absolute;
-            top: 0;
-            right: 0;
+            top: 0.5cm;
+            right: 0.3cm;
             /* other styles... */
         }
 
@@ -125,14 +126,14 @@
         #nav-buttons a {
             padding: 10px 20px;
             text-decoration: none;
-            color: #c9d1d9;
-            background: #fa1e0e; /* Bright Red Links */
+            color: #b3b3b3;
+            background: #2c0606; /* Bright Red Links */
             border-radius: 20px;
             transition: background 0.3s ease;
         }
 
         #nav-buttons a:hover {
-            background: #fa1e0e;
+            background: #6f0901;
         }
     </style>
 </head>
@@ -163,10 +164,8 @@
         </div>
     </div>
     <div id="nav-buttons">
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="{{ url_for('conversations') }}">Switch Conversation</a>
-              <a class="dropdown-item" href="{{ url_for('goto_models') }}">Switch Model</a>
-          </div>
+        <a class="dropdown-item" href="{{ url_for('conversations') }}">Switch Conversation</a>
+        <a class="dropdown-item" href="{{ url_for('goto_models') }}">Switch Model</a>
     </div>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>

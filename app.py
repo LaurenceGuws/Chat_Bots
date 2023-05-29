@@ -19,9 +19,6 @@ def load_messages(conversation_id):
     session['messages'] = messages
     return messages
 
-# def allowed_file(filename):
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in  {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip'}
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = './uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
@@ -70,13 +67,13 @@ def index():
         name = session['model_name']
 
         if message is not None:
-            messages.append('You: ' + message)
+            messages.append(message)
             message_obj = Message(user='You', text=message, conversation_id=conversation_id)
             db.session.add(message_obj)
         if session['model_name'] == 'bard':
-            response = chat.send_message(message)
+            response = chat.send_bard_message(message)
             if message is not None:
-                messages.append('Bard: ' + response)
+                messages.append(response)
                 message_obj = Message(user='Bard', text=response, conversation_id=conversation_id)
                 db.session.add(message_obj)
                 db.session.commit()
@@ -84,7 +81,7 @@ def index():
         if session['model_name'] == 'gpt_35_turbo':
             response = chat.chat_gpt_interact(session['messages'])
             if message is not None:
-                messages.append('gpt: ' + response)
+                messages.append(response)
                 message_obj = Message(user='gpt', text=response, conversation_id=conversation_id)
                 db.session.add(message_obj)
                 db.session.commit()
@@ -137,27 +134,7 @@ def goto_new_model():
     model_name = request.form['model_name']
     session['model_name'] = model_name
     print(f'model name changed to : ' + session['model_name'])
-    return redirect(url_for('index'))
-
-@app.route('/api/messages', methods=['GET'])
-def get_messages():
-    # Replace with your actual logic to fetch messages.
-    messages = session['messages']
-    messages = [msg.to_dict() for msg in messages]  # Convert messages to dictionaries (or any serializable format).
-    return {"messages": messages}, 200
-
-@app.route('/api/messages', methods=['POST'])
-def send_message():
-    data = request.get_json()
-    if not data or 'text' not in data:
-        return {"error": "No message provided"}, 400
-    message_text = data['text']
-    response = chat.send_message(message_text)
-    
-    # You might want to save the sent message and the response to your database here.
-
-    return {"response": response}, 200
-    
+    return redirect(url_for('index'))   
 
 if __name__ == '__main__':
     # app.run(debug=True)
