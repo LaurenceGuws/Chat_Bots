@@ -1,6 +1,6 @@
+import os
+import openai
 from predict import predict_large_language_model_sample
-from predict_gpt_35_turbo import predict_gpt_35_turbo
-
 
 class Chat:
     def __init__(self, project_id, model_name, temperature, max_output_tokens, top_p, top_k):
@@ -22,18 +22,21 @@ class Chat:
             top_k=self.top_k,
         )
         return response
-    def predict_gpt_35_turbo_call(messages):
-        response = predict_gpt_35_turbo(messages)
-        return response
 
-if __name__ == '__main__':
-    chat = Chat(project_id='palm-386622',
-                model_name='chat-bison@001',
-                temperature=0.5,
-                max_output_tokens=256,
-                top_p=0.9,
-                top_k=40)
-    while True:
-        message = input('You: ')
-        response = chat.send_message(message)
-        print('Bard:', response)
+    def chat_gpt_interact(self, messages):
+        messages_dicts = []
+        api_key = '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'
+        openai.api_key = api_key
+        print(openai.Model.list())
+        for i, message in enumerate(messages):
+            if i % 2 == 0:
+                messages_dicts.append({"role": "system", "content": message})
+            else:
+                messages_dicts.append({"role": "user", "content": message})
+
+        response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages_dicts
+        )
+
+        return response['choices'][0]['message']['content']

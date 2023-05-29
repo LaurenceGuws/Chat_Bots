@@ -48,9 +48,10 @@ class Message(db.Model):
 
 if os.path.isfile('instance/chat.db'):
     with app.app_context():
-        print('')
+        print('DB already created')
 else:
     with app.app_context():
+        print('Creating DB in /instances dir.')
         db.create_all()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -58,7 +59,6 @@ def index():
     if request.method == 'POST':
         message = request.form['message']
         messages = session['messages']
-        print(messages)
         # need to figure out how to add conversation_id here
         if session.get('conversation_id') is None:
             conversation = Conversation(name=message)
@@ -66,11 +66,8 @@ def index():
             db.session.commit()
             conversation_id = db.session.query(db.func.max(Conversation.id)).scalar()
             session['conversation_id'] = conversation_id
-            print(f'new conversation_id: {conversation_id}')
         conversation_id = session['conversation_id']
-        print(f'conversation_id: {conversation_id}')
         name = session['model_name']
-        print(f'model_name: {name}')
 
         if message is not None:
             messages.append('You: ' + message)
@@ -85,7 +82,7 @@ def index():
                 db.session.commit()
                 session['messages'] = messages
         if session['model_name'] == 'gpt_35_turbo':
-            response = chat.predict_gpt_35_turbo_call(message)
+            response = chat.chat_gpt_interact(session['messages'])
             if message is not None:
                 messages.append('gpt: ' + response)
                 message_obj = Message(user='gpt', text=response, conversation_id=conversation_id)
@@ -133,13 +130,14 @@ def goto_new_conversation():
     conversation_name = request.form['conversation_name']
     session['conversation_id'] = get_conversation_id(conversation_name)
     session['messages'] = load_messages(session['conversation_id'])
-    return render_template('index.html')
+    return redirect(url_for('index'))
 
 @app.route('/goto_model', methods=['POST'])
 def goto_new_model():
     model_name = request.form['model_name']
     session['model_name'] = model_name
-    return render_template('index.html')
+    print(f'model name changed to : ' + session['model_name'])
+    return redirect(url_for('index'))
 
 @app.route('/api/messages', methods=['GET'])
 def get_messages():
@@ -162,4 +160,5 @@ def send_message():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
