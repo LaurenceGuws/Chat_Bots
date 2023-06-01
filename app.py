@@ -87,13 +87,13 @@ def index():
                 db.session.commit()
                 session['messages'] = messages
         
-        return render_template('index.html')
+        return render_template('index.html', model_name=session['model_name'])
     else:   
         if session.get('messages') is None:
             session['messages'] = []
             session['model_names'] = ['gpt_35_turbo','bard']
             session['model_name'] = 'bard'
-        return render_template('index.html')
+        return render_template('index.html', model_name=session['model_name'])
     
 @app.route('/conversations')
 def conversations():
