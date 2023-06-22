@@ -1,3 +1,5 @@
+import os
+import openai
 from predict import predict_large_language_model_sample
 
 class Chat:
@@ -9,7 +11,7 @@ class Chat:
         self.top_p = top_p
         self.top_k = top_k
 
-    def send_message(self, message):
+    def send_bard_message(self, message):
         response = predict_large_language_model_sample(
             input=message,
             project_id=self.project_id,
@@ -21,14 +23,23 @@ class Chat:
         )
         return response
 
-if __name__ == '__main__':
-    chat = Chat(project_id='palm-386622',
-                model_name='chat-bison@001',
-                temperature=0.5,
-                max_output_tokens=256,
-                top_p=0.9,
-                top_k=40)
-    while True:
-        message = input('You: ')
-        response = chat.send_message(message)
-        print('Bard:', response)
+    def chat_gpt_interact(self, messages):
+        import configparser
+        config = configparser.ConfigParser()
+        config.read('config.conf')
+        openai_api_key = config['OpenAI']['API_KEY']
+        messages_dicts = []
+        openai.api_key = openai_api_key
+        # print(openai.Model.list())
+        for i, message in enumerate(messages):
+            if i % 2 == 0:
+                messages_dicts.append({"role": "system", "content": message})
+            else:
+                messages_dicts.append({"role": "user", "content": message})
+
+        response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        temperature=0,
+        messages=messages_dicts
+        )
+        return response['choices'][0]['message']['content']

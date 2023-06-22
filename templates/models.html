@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <title>Chat App</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <title>Select Model</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -136,39 +136,22 @@
             background: #6f0901;
         }
     </style>
-    <h1>Current Model: {{ model_name }}</h1>
 </head>
 <body>
     <div id="chat-app">
         <div id="chat-container">
-            <div id="messages">
-                <!-- Messages will be rendered here -->
-                {% for message in session['messages'] %}
-                {% if loop.index % 2 == 0 %}
-                <div class="message Bard">
-                  <span>Bard: {{ message }}</span>
-              </div>
-                {% else %}
-                <div class="message User">
-                  <span>User: {{ message }}</span>
-              </div>
-                {% endif %}
-                    
-                {% endfor %}
-            </div>
-            <div id="input-area">
-                <form method="POST">
-                    <textarea name="message" placeholder="Type a message..." required></textarea>
-                    <button type="submit">Send</button>
-                </form>
-            </div>
+            <h1>Select a Model</h1>
+            <form action="{{ url_for('goto_new_model') }}" method="POST">
+                <select class="form-control" name="model_name">
+                    {% for model_name in model_names %}
+                    <option value="{{ model_name }}">{{ model_name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-danger">Select</button>
+            </form>
         </div>
     </div>
-    <div id="nav-buttons">
-        <a class="dropdown-item" href="{{ url_for('conversations') }}">Switch Conversation</a>
-        <a class="dropdown-item" href="{{ url_for('goto_models') }}">Switch Model</a>
-    </div>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
